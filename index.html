@@ -56,9 +56,9 @@
             <div id="result-score-value"></div>
             <label>Guesses</label>
             <div id="result-score-guesses"></div>
-            <label>Online hack time</label>
+            <label>Online hack time (10 guesses per second)</label>
             <div id="result-score-time-to-crack-online"></div>
-            <label>Offline hack time</label>
+            <label>Offline hack time (10 billion guesses per second)</label>
             <div id="result-score-time-to-crack-offline"></div>
         </div>
         <div id="result-suggestions-container"></div>
@@ -122,7 +122,9 @@
             }
 
             var suggestions = result.feedback.suggestions || [];
-            var suggestionsHTML = "";
+            var suggestionsHTML = suggestions.length ?
+                "<label>Suggestions</label>" :
+                "";
 
             for (let index = 0; index < suggestions.length; index++) {
                 const suggestion = suggestions[index];
