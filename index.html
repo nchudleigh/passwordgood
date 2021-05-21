@@ -6,27 +6,63 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
+
+    <style>
+        body {
+            font-family: Open Sans, Arial;
+            color: #262626;
+            font-size: 16px;
+            margin: 2em auto;
+            max-width: 800px;
+            padding: 1em;
+            line-height: 1.4;
+            text-align: justify;
+        }
+        
+        label {
+            display: block;
+            margin-top: 1rem;
+            color: #7d7d7d;
+        }
+        
+        p {
+            margin: 0;
+        }
+        
+        #password-input-label {
+            color: #242424;
+            display: block;
+            margin-bottom: 1rem;
+            font-size: 24px;
+        }
+        
+        #password-input {
+            width: 16rem;
+        }
+    </style>
 </head>
 
 <body>
     <div id="input-container">
-        <label for="password-input">Do your worst.</label>
+        <label id="password-input-label" for="password-input">
+        Do your worst.
+      </label>
         <input id="password-input" type="text" name="password-input" onchange="ratePassword()" />
     </div>
 
     <div id="results-container">
-        <div id="result-score-container">
-            Score
+        <div id="result-score-container" style="display: none">
+            <label>Score</label>
             <div id="result-score-value"></div>
-            Guesses
+            <label>Guesses</label>
             <div id="result-score-guesses"></div>
-            Online hack time
+            <label>Online hack time</label>
             <div id="result-score-time-to-crack-online"></div>
-            Offline hack time
+            <label>Offline hack time</label>
             <div id="result-score-time-to-crack-offline"></div>
         </div>
         <div id="result-suggestions-container"></div>
-        Warning
+
         <div id="result-warning-container"></div>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/zxcvbn/4.4.2/zxcvbn.js" integrity="sha512-TZlMGFY9xKj38t/5m2FzJ+RM/aD5alMHDe26p0mYUMoCF5G7ibfHUQILq0qQPV3wlsnCwL+TPRNK4vIWGLOkUQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -39,9 +75,9 @@
             "result-warning-container"
         );
 
-        // var resultScoreContainer = document.getElementById(
-        //     "result-score-container"
-        // );
+        var resultScoreContainer = document.getElementById(
+            "result-score-container"
+        );
         var resultScoreValue = document.getElementById("result-score-value");
         var resultScoreGuesses = document.getElementById("result-score-guesses");
         var resultScoreTimeToCrackOnline = document.getElementById(
@@ -61,6 +97,8 @@
         }
 
         function renderScore(result) {
+            resultScoreContainer.style.display = "block";
+
             resultScoreValue.innerHTML = result.score;
             resultScoreGuesses.innerHTML = Number(result.guesses).toLocaleString(
                 undefined, {
@@ -76,7 +114,12 @@
         }
 
         function renderSuggestions(result) {
-            resultWarningContainer.innerHTML = result.feedback.warning;
+            if (result.feedback.warning) {
+                resultWarningContainer.innerHTML = `<label>Warning</label><p>${result.feedback.warning}</p>`;
+                resultWarningContainer.style.display = "inline";
+            } else {
+                resultWarningContainer.style.display = "none";
+            }
 
             var suggestions = result.feedback.suggestions || [];
             var suggestionsHTML = "";
