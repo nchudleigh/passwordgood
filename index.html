@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="input-container">
+        <label for="password-input">Do your worst.</label>
+        <input id="password-input" type="text" name="password-input" onchange="ratePassword()" />
+    </div>
+
+    <div id="results-container">
+        <div id="result-score-container">
+            Score
+            <div id="result-score-value"></div>
+            Guesses
+            <div id="result-score-guesses"></div>
+            Online hack time
+            <div id="result-score-time-to-crack-online"></div>
+            Offline hack time
+            <div id="result-score-time-to-crack-offline"></div>
+        </div>
+        <div id="result-suggestions-container"></div>
+        Warning
+        <div id="result-warning-container"></div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/zxcvbn/4.4.2/zxcvbn.js" integrity="sha512-TZlMGFY9xKj38t/5m2FzJ+RM/aD5alMHDe26p0mYUMoCF5G7ibfHUQILq0qQPV3wlsnCwL+TPRNK4vIWGLOkUQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+        var passwordInput = document.getElementById("password-input");
+        var suggestionsContainer = document.getElementById(
+            "result-suggestions-container"
+        );
+        var resultWarningContainer = document.getElementById(
+            "result-warning-container"
+        );
+
+        // var resultScoreContainer = document.getElementById(
+        //     "result-score-container"
+        // );
+        var resultScoreValue = document.getElementById("result-score-value");
+        var resultScoreGuesses = document.getElementById("result-score-guesses");
+        var resultScoreTimeToCrackOnline = document.getElementById(
+            "result-score-time-to-crack-online"
+        );
+        var resultScoreTimeToCrackOffline = document.getElementById(
+            "result-score-time-to-crack-offline"
+        );
+
+        function ratePassword() {
+            var password = passwordInput.value;
+            var result = zxcvbn(password);
+            // console.log(result);
+
+            renderScore(result);
+            renderSuggestions(result);
+        }
+
+        function renderScore(result) {
+            resultScoreValue.innerHTML = result.score;
+            resultScoreGuesses.innerHTML = Number(result.guesses).toLocaleString(
+                undefined, {
+                    minimumFractionDigits: 0,
+                }
+            );
+
+            resultScoreTimeToCrackOnline.innerHTML =
+                result.crack_times_display.online_no_throttling_10_per_second;
+
+            resultScoreTimeToCrackOffline.innerHTML =
+                result.crack_times_display.offline_fast_hashing_1e10_per_second;
+        }
+
+        function renderSuggestions(result) {
+            resultWarningContainer.innerHTML = result.feedback.warning;
+
+            var suggestions = result.feedback.suggestions || [];
+            var suggestionsHTML = "";
+
+            for (let index = 0; index < suggestions.length; index++) {
+                const suggestion = suggestions[index];
+                suggestionsHTML += `<p>${suggestion}</p>`;
+            }
+            suggestionsContainer.innerHTML = suggestionsHTML;
+        }
+    </script>
+</body>
+
+</html>
