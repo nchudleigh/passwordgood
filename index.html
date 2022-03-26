@@ -153,7 +153,7 @@
 
             const hashMatch = passwordHash.toUpperCase().slice(5, passwordHash.length)
             var regex = RegExp(`${hashMatch}:([0-9]+)`);
-            const match = r.match(regex);
+            const match = responseText.match(regex);
             return match instanceof Array && match.length == 2 ? match[1] : 0;
         }
     </script>
