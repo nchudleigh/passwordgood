@@ -68,6 +68,7 @@
         <div id="result-warning-container"></div>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/zxcvbn/4.4.2/zxcvbn.js" integrity="sha512-TZlMGFY9xKj38t/5m2FzJ+RM/aD5alMHDe26p0mYUMoCF5G7ibfHUQILq0qQPV3wlsnCwL+TPRNK4vIWGLOkUQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="/sha1.js"></script>
     <script>
         var passwordInput = document.getElementById("password-input");
         var suggestionsContainer = document.getElementById(
@@ -92,10 +93,11 @@
         function ratePassword() {
             var password = passwordInput.value;
             var result = zxcvbn(password);
-            // console.log(result);
+            var passwordHash = SHA1(password);
 
             renderScore(result);
             renderSuggestions(result);
+            getPwnedCount(passwordHash)
         }
 
         function renderScore(result) {
@@ -133,6 +135,10 @@
                 suggestionsHTML += `<p>${suggestion}</p>`;
             }
             suggestionsContainer.innerHTML = suggestionsHTML;
+        }
+
+        function getPwnedCount(passwordHash) {
+            fetch(`https://api.pwnedpasswords.com/range/${passwordHash.slice(0,5)}`)
         }
     </script>
 </body>
