@@ -6,7 +6,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>PasswordGood®</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔐</text></svg>" />
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔐</text></svg>" />
 
     <style>
         body {
@@ -19,24 +20,24 @@
             line-height: 1.4;
             text-align: justify;
         }
-        
+
         label {
             display: block;
             margin-top: 1rem;
             color: #7d7d7d;
         }
-        
+
         p {
             margin: 0;
         }
-        
+
         #password-input-label {
             color: #242424;
             display: block;
             margin-bottom: 1rem;
             font-size: 24px;
         }
-        
+
         #password-input {
             width: 16rem;
         }
@@ -47,8 +48,8 @@
     <h1>🔐 PasswordGood®</h1>
     <div id="input-container">
         <label id="password-input-label" for="password-input">
-        Do your worst.
-      </label>
+            Do your worst.
+        </label>
         <input id="password-input" type="text" name="password-input" onkeyup="ratePassword()" />
     </div>
 
@@ -67,7 +68,9 @@
 
         <div id="result-warning-container"></div>
     </div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/zxcvbn/4.4.2/zxcvbn.js" integrity="sha512-TZlMGFY9xKj38t/5m2FzJ+RM/aD5alMHDe26p0mYUMoCF5G7ibfHUQILq0qQPV3wlsnCwL+TPRNK4vIWGLOkUQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/zxcvbn/4.4.2/zxcvbn.js"
+        integrity="sha512-TZlMGFY9xKj38t/5m2FzJ+RM/aD5alMHDe26p0mYUMoCF5G7ibfHUQILq0qQPV3wlsnCwL+TPRNK4vIWGLOkUQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="/sha1.js"></script>
     <script>
         var passwordInput = document.getElementById("password-input");
@@ -94,10 +97,10 @@
             var password = passwordInput.value;
             var result = zxcvbn(password);
             var passwordHash = SHA1(password);
-
+            const pwnedCount = getPwnedCount(passwordHash);
+            console.log(pwnedCount);
             renderScore(result);
             renderSuggestions(result);
-            getPwnedCount(passwordHash)
         }
 
         function renderScore(result) {
@@ -106,8 +109,8 @@
             resultScoreValue.innerHTML = result.score;
             resultScoreGuesses.innerHTML = Number(result.guesses).toLocaleString(
                 undefined, {
-                    minimumFractionDigits: 0,
-                }
+                minimumFractionDigits: 0,
+            }
             );
 
             resultScoreTimeToCrackOnline.innerHTML =
@@ -138,7 +141,11 @@
         }
 
         function getPwnedCount(passwordHash) {
-            fetch(`https://api.pwnedpasswords.com/range/${passwordHash.slice(0,5)}`)
+            fetch(`https://api.pwnedpasswords.com/range/${passwordHash.slice(0, 5)}`).then(r => r.text()).then(r => {
+                var regex = RegExp(`${passwordHash.toUpperCase()}:([0-9]+)`);
+                const match = r.match(regex);
+                return match.length == 2 ? match[1] : 0;
+            })
         }
     </script>
 </body>
