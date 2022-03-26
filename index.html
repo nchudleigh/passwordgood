@@ -102,9 +102,7 @@
         function ratePassword() {
             var password = passwordInput.value;
             var result = zxcvbn(password);
-            var passwordHash = SHA1(password);
-            const breachCount = getBreachCount(passwordHash);
-            console.log(breachCount);
+            getBreachCount(password).then(breachCount => renderScore(result, breachCount));
             renderScore(result, breachCount);
             renderSuggestions(result);
         }
@@ -148,13 +146,15 @@
             suggestionsContainer.innerHTML = suggestionsHTML;
         }
 
-        function getBreachCount(passwordHash) {
-            fetch(`https://api.pwnedpasswords.com/range/${passwordHash.slice(0, 5)}`).then(r => r.text()).then(r => {
-                const hashMatch = passwordHash.toUpperCase().slice(5, passwordHash.length)
-                var regex = RegExp(`${hashMatch}:([0-9]+)`);
-                const match = r.match(regex);
-                return match instanceof Array && match.length == 2 ? match[1] : 0;
-            })
+        async function getBreachCount(password) {
+            var passwordHash = SHA1(password);
+            const response = await fetch(`https://api.pwnedpasswords.com/range/${passwordHash.slice(0, 5)}`)
+            const responseText = await response.text()
+
+            const hashMatch = passwordHash.toUpperCase().slice(5, passwordHash.length)
+            var regex = RegExp(`${hashMatch}:([0-9]+)`);
+            const match = r.match(regex);
+            return match instanceof Array && match.length == 2 ? match[1] : 0;
         }
     </script>
 </body>
