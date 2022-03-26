@@ -59,10 +59,13 @@
             <div id="result-score-value"></div>
             <label>Guesses</label>
             <div id="result-score-guesses"></div>
+            <label>Number of times exposed in breach</label>
+            <div id="result-exposed-in-breach"></div>
             <label>Online hack time (10 guesses per second)</label>
             <div id="result-score-time-to-crack-online"></div>
             <label>Offline hack time (10 billion guesses per second)</label>
             <div id="result-score-time-to-crack-offline"></div>
+            
         </div>
         <div id="result-suggestions-container"></div>
 
@@ -92,18 +95,21 @@
         var resultScoreTimeToCrackOffline = document.getElementById(
             "result-score-time-to-crack-offline"
         );
+        var resultExposedInBreach = document.getElementById(
+            "result-exposed-in-breach"
+        );
 
         function ratePassword() {
             var password = passwordInput.value;
             var result = zxcvbn(password);
             var passwordHash = SHA1(password);
-            const pwnedCount = getPwnedCount(passwordHash);
-            console.log(pwnedCount);
-            renderScore(result);
+            const breachCount = getBreachCount(passwordHash);
+            console.log(breachCount);
+            renderScore(result, breachCount);
             renderSuggestions(result);
         }
 
-        function renderScore(result) {
+        function renderScore(result, breachCount) {
             resultScoreContainer.style.display = "block";
 
             resultScoreValue.innerHTML = result.score;
@@ -118,6 +124,8 @@
 
             resultScoreTimeToCrackOffline.innerHTML =
                 result.crack_times_display.offline_fast_hashing_1e10_per_second;
+
+            resultExposedInBreach.innerHTML = breachCount;
         }
 
         function renderSuggestions(result) {
@@ -140,11 +148,12 @@
             suggestionsContainer.innerHTML = suggestionsHTML;
         }
 
-        function getPwnedCount(passwordHash) {
+        function getBreachCount(passwordHash) {
             fetch(`https://api.pwnedpasswords.com/range/${passwordHash.slice(0, 5)}`).then(r => r.text()).then(r => {
-                var regex = RegExp(`${passwordHash.toUpperCase()}:([0-9]+)`);
+                const hashMatch = passwordHash.toUpperCase().slice(5, passwordHash.length)
+                var regex = RegExp(`${hashMatch}:([0-9]+)`);
                 const match = r.match(regex);
-                return match.length == 2 ? match[1] : 0;
+                return match instanceof Array && match.length == 2 ? match[1] : 0;
             })
         }
     </script>
