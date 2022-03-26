@@ -103,7 +103,7 @@
             var password = passwordInput.value;
             var result = zxcvbn(password);
             getBreachCount(password).then(breachCount => renderScore(result, breachCount));
-            renderScore(result, breachCount);
+            renderScore(result);
             renderSuggestions(result);
         }
 
