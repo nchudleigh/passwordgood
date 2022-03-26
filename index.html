@@ -111,11 +111,7 @@
             resultScoreContainer.style.display = "block";
 
             resultScoreValue.innerHTML = result.score;
-            resultScoreGuesses.innerHTML = Number(result.guesses).toLocaleString(
-                undefined, {
-                minimumFractionDigits: 0,
-            }
-            );
+            resultScoreGuesses.innerHTML = Intl.NumberFormat().format(Number(result.guesses));
 
             resultScoreTimeToCrackOnline.innerHTML =
                 result.crack_times_display.online_no_throttling_10_per_second;
@@ -123,7 +119,7 @@
             resultScoreTimeToCrackOffline.innerHTML =
                 result.crack_times_display.offline_fast_hashing_1e10_per_second;
 
-            resultExposedInBreach.innerHTML = breachCount;
+            resultExposedInBreach.innerHTML = Intl.NumberFormat().format(breachCount);
         }
 
         function renderSuggestions(result) {
