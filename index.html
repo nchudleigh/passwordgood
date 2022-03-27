@@ -12,7 +12,7 @@
     <style>
         body {
             font-family: Open Sans, Arial;
-            color: #262626;
+            color: #151515;
             font-size: 16px;
             margin: 2em auto;
             max-width: 800px;
@@ -32,7 +32,7 @@
         }
 
         #password-input-label {
-            color: #242424;
+            
             display: block;
             margin-bottom: 1rem;
             font-size: 24px;
@@ -41,16 +41,23 @@
         #password-input {
             width: 16rem;
         }
+
+        a {
+            color: #151515;
+        }
     </style>
 </head>
 
 <body>
     <h1>🔐 PasswordGood®</h1>
+    <p>
+        Creating a good password is hard! Try thinking of one and see how it scores below.
+    </p>
     <div id="input-container">
         <label id="password-input-label" for="password-input">
-            Do your worst.
+            
         </label>
-        <input id="password-input" type="text" name="password-input" onkeyup="ratePassword()" />
+        <input id="password-input" type="text" name="password-input" onkeyup="ratePassword()" placeholder="" autofocus/>
     </div>
 
     <div id="results-container">
@@ -71,9 +78,16 @@
 
         <div id="result-warning-container"></div>
     </div>
+    <div style="position: absolute; bottom: 0;">
+        Don't trust it? 
+        <a href="https://github.com/nchudleigh/passwordgood" target="_blank">
+        Read the source
+        </a>
+    </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/zxcvbn/4.4.2/zxcvbn.js"
         integrity="sha512-TZlMGFY9xKj38t/5m2FzJ+RM/aD5alMHDe26p0mYUMoCF5G7ibfHUQILq0qQPV3wlsnCwL+TPRNK4vIWGLOkUQ=="
-        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        crossorigin="anonymous" referrerpolicy="no-referrer">
+    </script>
     <script src="/sha1.js"></script>
     <script>
         var passwordInput = document.getElementById("password-input");
@@ -143,13 +157,25 @@
         }
 
         async function getBreachCount(password) {
-            var passwordHash = SHA1(password);
-            const response = await fetch(`https://api.pwnedpasswords.com/range/${passwordHash.slice(0, 5)}`)
-            const responseText = await response.text()
+            // You can read more on the service being used here
+            // https://haveibeenpwned.com/API/v3#PwnedPasswords
 
-            const hashMatch = passwordHash.toUpperCase().slice(5, passwordHash.length)
+            // Get a SHA1 hash for the password
+            // Uses the function defined in sha1.js
+            var passwordHash = SHA1(password);
+            // Fetch the set of matching hashes & their occurances from haveibeenpwned
+            // Provide only the first 5 characters of the hash to the API
+            const response = await fetch(`https://api.pwnedpasswords.com/range/${passwordHash.slice(0, 5)}`)
+            // Get the hash text from the response.
+            const responseText = await response.text()
+            // Get the password hash in upper case without the first 5 characters 
+            const hashMatch = passwordHash.toUpperCase().slice(5)
+            // Build a RegExp to extract the occurances count
             var regex = RegExp(`${hashMatch}:([0-9]+)`);
+            // Match for the hash in the response
             const match = responseText.match(regex);
+            // If we found an exact match, grab the occurances from it
+            // Otherwise return 0
             return match instanceof Array && match.length == 2 ? match[1] : 0;
         }
     </script>
