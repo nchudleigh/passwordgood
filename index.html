@@ -6,8 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>PasswordGood®</title>
-    <link rel="icon"
-        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔐</text></svg>" />
+    <link rel="icon" href="/lock-sm.webp"/>
 
     <style>
         body {
@@ -19,6 +18,17 @@
             padding: 1em;
             line-height: 1.4;
             text-align: justify;
+            background-color: rgb(251, 239, 228);
+        }
+        
+        #lock {
+            width: 30px; 
+            right: 0;
+            margin-right:1rem;
+        }
+
+        h1 {
+            font-size: 3rem;
         }
 
         label {
@@ -32,7 +42,6 @@
         }
 
         #password-input-label {
-            
             display: block;
             margin-bottom: 1rem;
             font-size: 24px;
@@ -45,26 +54,42 @@
         a {
             color: #151515;
         }
+
+
+        input {
+            height: 30px;
+            box-shadow: 2px 2px 3px 0 rgba(0,0,0,.25);
+        }
     </style>
 </head>
 
 <body>
-    <h1>🔐 PasswordGood®</h1>
-    <p>
-        Creating a good password is hard! Try thinking of one and see how it scores below.
+    <div style="display: flex; align-items: center;">
+        <img id="lock" src="/lock-md.webp"/>
+        <h1>PasswordGood®</h1>
+    </div>
+    <p style="font-size: 1.25rem;">
+        Creating a good password is hard!<br>
+        Try one out and see how it scores below.
     </p>
     <div id="input-container">
         <label id="password-input-label" for="password-input">
             
         </label>
         <input id="password-input" type="text" name="password-input" onkeyup="ratePassword()" placeholder="" autofocus/>
+        <div style="margin-top: .5rem;">
+            Don't trust it? 
+            <a href="https://github.com/nchudleigh/passwordgood" target="_blank">
+            Read the source
+            </a>
+        </div>
     </div>
 
     <div id="results-container">
         <div id="result-score-container" style="display: none">
             <label>Score</label>
             <div id="result-score-value"></div>
-            <label>Guesses</label>
+            <label>Estimated guesses</label>
             <div id="result-score-guesses"></div>
             <label>Number of times exposed in breach</label>
             <div id="result-exposed-in-breach"></div>
@@ -78,12 +103,7 @@
 
         <div id="result-warning-container"></div>
     </div>
-    <div style="position: absolute; bottom: 0;">
-        Don't trust it? 
-        <a href="https://github.com/nchudleigh/passwordgood" target="_blank">
-        Read the source
-        </a>
-    </div>
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/zxcvbn/4.4.2/zxcvbn.js"
         integrity="sha512-TZlMGFY9xKj38t/5m2FzJ+RM/aD5alMHDe26p0mYUMoCF5G7ibfHUQILq0qQPV3wlsnCwL+TPRNK4vIWGLOkUQ=="
         crossorigin="anonymous" referrerpolicy="no-referrer">
@@ -116,15 +136,27 @@
         function ratePassword() {
             var password = passwordInput.value;
             var result = zxcvbn(password);
-            getBreachCount(password).then(breachCount => renderScore(result, breachCount));
-            renderScore(result, 0);
+            const passwordLength = password.length;
+            if (passwordLength > 4) {
+                getBreachCount(password).then(breachCount => renderScore(result, breachCount));
+                renderScore(result, 0);
+            } else {
+                renderScore(result, "Too short to check!");
+            }
             renderSuggestions(result);
         }
 
         function renderScore(result, breachCount) {
             resultScoreContainer.style.display = "block";
 
-            resultScoreValue.innerHTML = result.score;
+            resultScoreValue.innerHTML = {
+                0: 'Terrible',
+                1: 'Bad',
+                2: 'Fine',
+                3: 'Okay',
+                4: '<i>So good.</i>'
+
+            }[result.score];
             resultScoreGuesses.innerHTML = Intl.NumberFormat().format(Number(result.guesses));
 
             resultScoreTimeToCrackOnline.innerHTML =
@@ -133,7 +165,7 @@
             resultScoreTimeToCrackOffline.innerHTML =
                 result.crack_times_display.offline_fast_hashing_1e10_per_second;
 
-            resultExposedInBreach.innerHTML = Intl.NumberFormat().format(breachCount);
+            resultExposedInBreach.innerHTML = typeof breachCount == Number ? Intl.NumberFormat().format(breachCount): breachCount;
         }
 
         function renderSuggestions(result) {
